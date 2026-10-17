@@ -3,106 +3,513 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agentic Creator Studio</title>
+  <title>Agentic Creator Studio | AI Swarm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0f172a; color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 16px; }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
-    h1 { font-size: 1.4rem; color: #38bdf8; margin-bottom: 8px; text-align: center; }
-    p { font-size: 0.9rem; color: #94a3b8; margin-bottom: 16px; text-align: center; }
-    label { font-size: 0.85rem; color: #cbd5e1; display: block; margin-bottom: 6px; }
-    textarea, input[type="text"], input[type="file"] {
-      width: 100%; padding: 12px; background: #0f172a; border: 1px solid #475569; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 0.9rem;
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-gradient: radial-gradient(130% 100% at 50% 0%, #e0f2fe 0%, #f0f9ff 35%, #ffffff 75%);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(37, 99, 235, 0.12);
+      --shadow-3d: 0 20px 40px -15px rgba(37, 99, 235, 0.18), 0 0 0 1px rgba(226, 232, 240, 0.8);
     }
-    button {
-      width: 100%; padding: 14px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
     }
-    button:disabled { background: #475569; cursor: not-allowed; }
-    .result-box { display: none; background: #0f172a; border: 1px solid #38bdf8; border-radius: 8px; padding: 16px; margin-top: 16px; }
-    .result-title { font-weight: bold; color: #38bdf8; margin-bottom: 8px; }
-    .result-content { font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; color: #e2e8f0; }
+
+    /* Ambient 3D floating spheres */
+    .bg-sphere-1 {
+      position: fixed;
+      top: -60px;
+      left: -60px;
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(37, 99, 235, 0.1));
+      border-radius: 50%;
+      filter: blur(45px);
+      z-index: 0;
+      animation: floatSlow 8s ease-in-out infinite alternate;
+    }
+    .bg-sphere-2 {
+      position: fixed;
+      bottom: -40px;
+      right: -40px;
+      width: 240px;
+      height: 240px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(37, 99, 235, 0.15));
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: 0;
+      animation: floatSlow 10s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes floatSlow {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(20px) scale(1.08); }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 580px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top Brand Nav */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #0f172a;
+    }
+    .brand-logo .dot-bot {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+    .status-badge {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-badge .ping {
+      width: 7px;
+      height: 7px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    }
+
+    /* Hero header */
+    .hero {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .tagline-chip {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    h1 span {
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.hero-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Studio Card */
+    .studio-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-3d);
+      margin-bottom: 24px;
+      transition: transform 0.2s ease;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+    label span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      color: #0f172a;
+      resize: vertical;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    textarea:focus {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+    textarea::placeholder {
+      color: #94a3b8;
+      font-size: 0.88rem;
+    }
+
+    /* Generate Button */
+    .btn-action {
+      width: 100%;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.45);
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px -5px rgba(37, 99, 235, 0.55);
+    }
+    .btn-action:active {
+      transform: translateY(0);
+    }
+    .btn-action:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Loading state */
+    #loader {
+      display: none;
+      text-align: center;
+      padding: 24px 0 10px;
+    }
+    .spinner {
+      width: 34px;
+      height: 34px;
+      border: 3.5px solid #dbeafe;
+      border-top: 3.5px solid var(--primary);
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader-text {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #1e40af;
+    }
+
+    /* Output Results Card */
+    #outputContainer {
+      display: none;
+      background: #ffffff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 20px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 15px 30px -10px rgba(37, 99, 235, 0.12);
+    }
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .output-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-btn {
+      padding: 6px 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #2563eb;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+    #outputContent {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: #334155;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* How It Works Feature Strip */
+    .steps-section {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .steps-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .step-item:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #2563eb;
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-txt {
+      font-size: 0.82rem;
+      color: #475569;
+      line-height: 1.45;
+    }
+    .step-txt strong { color: #0f172a; }
   </style>
 </head>
 <body>
+  <div class="bg-sphere-1"></div>
+  <div class="bg-sphere-2"></div>
+
   <div class="container">
-    <div class="card">
-      <h1>Agentic Creator Studio</h1>
-      <p>Job alert upload karein aur viral Short script + SEO tags payein.</p>
-      
-      <label>1. Job Details (Text Paste Karein):</label>
-      <textarea id="jobText" rows="4" placeholder="Company, Role, Salary, Location ya Notification text yahan paste karein..."></textarea>
-      
-      <label>2. Ya Job Poster / Image Upload Karein:</label>
-      <input type="file" id="jobImage" accept="image/*">
-      
-      <button id="submitBtn" onclick="processJob()">Viral Content Generate Karein</button>
-      
-      <div id="loader" style="display:none; text-align:center; padding:15px; color:#38bdf8;">Agents kaam kar rahe hain, thoda intezar karein...</div>
-      
-      <div id="resultBox" class="result-box">
-        <div class="result-title">Generated Result:</div>
-        <div id="resultContent" class="result-content"></div>
+    <!-- Navbar -->
+    <div class="nav">
+      <div class="brand-logo">
+        <div class="dot-bot">⚡</div>
+        <span>Creator Studio</span>
+      </div>
+      <div class="status-badge">
+        <span class="ping"></span>
+        Gemini 1.5 Active
+      </div>
+    </div>
+
+    <!-- Hero Header -->
+    <div class="hero">
+      <span class="tagline-chip">🎯 Autonomous Creator Suite</span>
+      <h1>Shorts Script & SEO <span>in 10 Seconds</span></h1>
+      <p class="hero-desc">Job alerts & notifications ko viral YouTube Shorts script, catchy hook aur SEO tags me convert karein.</p>
+    </div>
+
+    <!-- Main Studio Card -->
+    <div class="studio-card">
+      <div class="form-group">
+        <label>
+          1. Job Notification / Vacancy Details
+          <span>Text paste karein</span>
+        </label>
+        <textarea id="jobDetails" placeholder="Example:
+Company: Swiggy / Zomato
+Role: Delivery Executive & Warehouse Associate
+Location: Delhi NCR
+Salary: ₹22,000 - ₹28,000 / month
+Walk-in date: Tomorrow 10 AM"></textarea>
+      </div>
+
+      <button id="generateBtn" class="btn-action" onclick="runCreatorAgent()">
+        <span>🚀</span> Generate Viral Script & SEO
+      </button>
+
+      <!-- Loader -->
+      <div id="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">AI Agents script formulate kar rahe hain...</div>
+      </div>
+
+      <!-- Result Card -->
+      <div id="outputContainer">
+        <div class="output-header">
+          <div class="output-title">✨ Generated Output</div>
+          <button class="copy-btn" onclick="copyContent()">Copy All</button>
+        </div>
+        <div id="outputContent"></div>
+      </div>
+    </div>
+
+    <!-- 2D/3D How It Works Card -->
+    <div class="steps-section">
+      <div class="steps-title">⚡ How Creator Studio Works</div>
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-txt"><strong>Parse Details:</strong> Agent vacancy aur eligibility factors ko process karta hai.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-txt"><strong>High Retention Hook:</strong> Shorts ke pehle 3 second ke liye viral audio hook formulate karta hai.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-txt"><strong>SEO Engine:</strong> Description, YouTube algorithm tags aur rankable hashtags deliver karta hai.</div>
       </div>
     </div>
   </div>
 
   <script>
-    const N8N_URL = "https://agenticcreator.app.n8n.cloud/webhook/agentic-process";
+    // =========================================================================
+    // 👉 [STEP 2]: APNI GOOGLE AI STUDIO KI GEMINI API KEY YAHAN PASTE KAREIN:
+    // =========================================================================
+    const GEMINI_API_KEY = "AQ.Ab8RN6JUPjz66LFq-DuRN-04FOZnSDkSU6C7K0eJOb_vNL3_hw";
+    // =========================================================================
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-      });
-    }
+    async function runCreatorAgent() {
+      const jobInput = document.getElementById("jobDetails").value.trim();
+      const btn = document.getElementById("generateBtn");
+      const loader = document.getElementById("loader");
+      const outputCard = document.getElementById("outputContainer");
+      const outputText = document.getElementById("outputContent");
 
-    async function processJob() {
-      const text = document.getElementById('jobText').value;
-      const fileInput = document.getElementById('jobImage');
-      const submitBtn = document.getElementById('submitBtn');
-      const loader = document.getElementById('loader');
-      const resultBox = document.getElementById('resultBox');
-      const resultContent = document.getElementById('resultContent');
-
-      if (!text && fileInput.files.length === 0) {
-        alert("Kripya text likhein ya image select karein!");
+      if (!jobInput) {
+        alert("Kripya pehle Job details box me vacancy text paste karein!");
         return;
       }
 
-      submitBtn.disabled = true;
+      if (!GEMINI_API_KEY || GEMINI_API_KEY === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
+        alert("API Key missing! Kripya code me apni Google AI Studio ki API Key paste karein.");
+        return;
+      }
+
+      btn.disabled = true;
       loader.style.display = "block";
-      resultBox.style.display = "none";
+      outputCard.style.display = "none";
+
+      const prompt = `Aap ek highly skilled YouTube Shorts job-alert creator agent hain. 
+Neeche di gayi vacancy details ke aadhar par ek viral, high-retention YouTube Short script aur complete SEO metadata taiyar karein.
+
+Format:
+1. 🎯 VIRAL HOOK (Pehle 3 second jo scroll stop kare)
+2. 🎬 40-SECOND SCRIPT (Visual cue + Voiceover dialogue in simple Hindi/Hinglish)
+3. 📌 CALL TO ACTION (Apply karne aur channel follow karne ka call)
+4. 🏷️ VIRAL SEO METADATA:
+   - High-CTR Video Title
+   - Video Description (including disclaimer)
+   - 10 Rankable YouTube Tags & Hashtags
+
+Job Details:
+${jobInput}`;
 
       try {
-        let payload = {
-          autopilot: false,
-          mode: fileInput.files.length > 0 ? "image" : "text",
-          text_content: text
-        };
-
-        if (fileInput.files.length > 0) {
-          payload.image_base64 = await fileToBase64(fileInput.files[0]);
-        }
-
-        const response = await fetch(N8N_URL, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
         });
 
-        const data = await response.json();
-        resultContent.innerText = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
-        resultBox.style.display = "block";
+        const data = await res.json();
+
+        if (data.candidates && data.candidates[0].content) {
+          outputText.innerText = data.candidates[0].content.parts[0].text;
+          outputCard.style.display = "block";
+        } else if (data.error) {
+          outputText.innerText = "Google API Error: " + data.error.message;
+          outputCard.style.display = "block";
+        } else {
+          outputText.innerText = "Error: Unexpected response format.";
+          outputCard.style.display = "block";
+        }
       } catch (err) {
-        alert("Error: " + err.message);
+        alert("Network Error: " + err.message);
       } finally {
-        submitBtn.disabled = false;
+        btn.disabled = false;
         loader.style.display = "none";
       }
     }
+
+    function copyContent() {
+      const text = document.getElementById("outputContent").innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Script aur SEO Tags clipboard me copy ho gaye!");
+      });
+    }
   </script>
 </body>
-</html>
+  </html>
+  
